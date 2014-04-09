@@ -11,11 +11,11 @@ describe('create', function () {
 			}
 		});
 
-		personMoldy.name = 'David';
+		personMoldy.name = 'Glen';
 
 		personMoldy.$save(function (_error) {
 
-			personMoldy.name.should.eql('David');
+			personMoldy.name.should.eql('Glen');
 			_done(_error);
 
 		});

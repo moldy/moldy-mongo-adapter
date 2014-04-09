@@ -19,7 +19,7 @@ describe('save', function () {
 			}
 
 			key = personMoldy.id;
-			personMoldy.name = 'Mr David';
+			personMoldy.name = 'Mr Glen';
 
 			personMoldy.$save(function (_error) {
 

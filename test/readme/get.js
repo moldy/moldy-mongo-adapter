@@ -16,7 +16,7 @@ describe('get', function () {
 	it('should create a new person so we can `get` it next', function (_done) {
 		var personMoldy = new Moldy('person', schema);
 
-		personMoldy.name = 'Mr David';
+		personMoldy.name = 'Mr Glen';
 
 		personMoldy.$save(function (_error) {
 			newPersonId = personMoldy.id;
@@ -29,14 +29,14 @@ describe('get', function () {
 
 		personMoldy.$get({
 			id: newPersonId
-		}, function (_error, david) {
+		}, function (_error, glen) {
 
 			if (_error) {
 				return _done(_error);
 			}
 
-			david.name.should.eql('Mr David');
-			david.$destroy(_done);
+			glen.name.should.eql('Mr Glen');
+			glen.$destroy(_done);
 
 		});
 	});

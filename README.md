@@ -1,21 +1,21 @@
 # TOC
-   - [moldy-file-adapter](#moldy-file-adapter)
-     - [create](#moldy-file-adapter-create)
-     - [get](#moldy-file-adapter-get)
-     - [collection](#moldy-file-adapter-collection)
-     - [save](#moldy-file-adapter-save)
-     - [destroy](#moldy-file-adapter-destroy)
+   - [moldy-mongo-adapter](#moldy-mongo-adapter)
+     - [create](#moldy-mongo-adapter-create)
+     - [get](#moldy-mongo-adapter-get)
+     - [collection](#moldy-mongo-adapter-collection)
+     - [save](#moldy-mongo-adapter-save)
+     - [destroy](#moldy-mongo-adapter-destroy)
 <a name=""></a>
  
-<a name="moldy-file-adapter"></a>
-# moldy-file-adapter
+<a name="moldy-mongo-adapter"></a>
+# moldy-mongo-adapter
 Tell `Moldy` to use the `file` adapter.
 
 ```js
-// Moldy.use( require('moldy-file-adapter') );
+// Moldy.use( require('moldy-mongo-adapter') );
 ```
 
-<a name="moldy-file-adapter-create"></a>
+<a name="moldy-mongo-adapter-create"></a>
 ## create
 should `create` by a property.
 
@@ -26,14 +26,14 @@ var personMoldy = new Moldy('person', {
 		age: ''
 	}
 });
-personMoldy.name = 'David';
+personMoldy.name = 'Glen';
 personMoldy.$save(function (_error) {
-	personMoldy.name.should.eql('David');
+	personMoldy.name.should.eql('Glen');
 	_done(_error);
 });
 ```
 
-<a name="moldy-file-adapter-get"></a>
+<a name="moldy-mongo-adapter-get"></a>
 ## get
 define a JSON schema.
 
@@ -49,7 +49,7 @@ should create a new person so we can `get` it next.
 
 ```js
 var personMoldy = new Moldy('person', schema);
-personMoldy.name = 'Mr David';
+personMoldy.name = 'Mr Glen';
 personMoldy.$save(function (_error) {
 	newPersonId = personMoldy.id;
 	_done(_error);
@@ -62,16 +62,16 @@ should `get` by a `id` from the previous example.
 var personMoldy = new Moldy('person', schema);
 personMoldy.$get({
 	id: newPersonId
-}, function (_error, david) {
+}, function (_error, glen) {
 	if (_error) {
 		return _done(_error);
 	}
-	david.name.should.eql('Mr David');
-	david.$destroy(_done);
+	glen.name.should.eql('Mr Glen');
+	glen.$destroy(_done);
 });
 ```
 
-<a name="moldy-file-adapter-collection"></a>
+<a name="moldy-mongo-adapter-collection"></a>
 ## collection
 should `get` a `collection`.
 
@@ -99,7 +99,7 @@ personMoldy.$collection(function (_error, _people) {
 });
 ```
 
-<a name="moldy-file-adapter-save"></a>
+<a name="moldy-mongo-adapter-save"></a>
 ## save
 should `save` a model.
 
@@ -115,7 +115,7 @@ personMoldy.$get(function (_error) {
 		return _done(_error);
 	}
 	key = personMoldy.id;
-	personMoldy.name = 'Mr David';
+	personMoldy.name = 'Mr Glen';
 	personMoldy.$save(function (_error) {
 		if (_error) {
 			return _done(_error);
@@ -136,7 +136,7 @@ personMoldy.$get(function (_error) {
 });
 ```
 
-<a name="moldy-file-adapter-destroy"></a>
+<a name="moldy-mongo-adapter-destroy"></a>
 ## destroy
 define a JSON schema.
 

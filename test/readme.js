@@ -4,10 +4,10 @@ var Moldy = require('moldy'),
 
 Moldy.use(require('../src'));
 
-describe('moldy-file-adapter', function () {
+describe('moldy-mongo-adapter', function () {
 
-	it('Tell `Moldy` to use the `file` adapter', function () {
-		// Moldy.use( require('moldy-file-adapter') );
+	it('Tell `Moldy` to use the `mongo` adapter', function () {
+		// Moldy.use( require('moldy-mongo-adapter') );
 	});
 
 	require('./readme/create');
