@@ -4,28 +4,28 @@ var Moldy = require('moldy'),
 describe('collection', function () {
 
 	it('should `get` a `collection`', function (_done) {
-		var personMoldy = new Moldy('person', {
+		var carMoldy = new Moldy('cars', {
 			properties: {
-				name: 'string',
-				age: 'number'
+				make: 'string',
+				model: 'string'
 			}
 		});
 
-		personMoldy.$collection(function (_error, _people) {
+		carMoldy.$collection(function (_error, _cars) {
 
 			if (_error) {
 				return _done(_error);
 			}
 
-			_people.should.be.an.Array;
-			_people.length.should.greaterThan(0);
+			_cars.should.be.an.Array;
+			_cars.length.should.greaterThan(0);
 
-			_people.forEach(function (_person) {
-				_person.should.be.a.Moldy;
-				_person.should.have.a.property('id');
-				_person.should.have.a.property('name');
-				_person.should.have.a.property('age');
-				Object.keys(_person.$json()).should.have.a.lengthOf(3);
+			_cars.forEach(function (_car) {
+				_car.should.be.a.Moldy;
+				_car.should.have.a.property('id');
+				_car.should.have.a.property('make');
+				_car.should.have.a.property('model');
+				Object.keys(_car.$json()).should.have.a.lengthOf(3);
 			});
 
 			_done();

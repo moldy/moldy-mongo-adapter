@@ -1,112 +1,178 @@
 var cast = require('sc-cast'),
-	fdb = require('file-db'),
-	fs = require('fs-extra'),
 	hasKey = require('sc-haskey'),
-	is = require('sc-is'),
-	_ = require('underscore'),
-	fdbKey = '_id';
+	MongoClient = require('mongodb').MongoClient,
+	ObjectID = require('mongodb').ObjectID;
 
-var swapKeys = function (_object, _oldKey, _newKey) {
-	if (hasKey(_object, _oldKey, 'string')) {
-		_object[_newKey] = _object[_oldKey];
-		if (_oldKey !== _newKey) {
-			delete _object[_oldKey];
-		}
-	}
-};
+var LOGGING_ON = true,
+	DEFAULT_DATABASE = 'MoldyModelsUnnamed';
+
+
 
 module.exports = function (_model, _data, _method, _url, _callback) {
 	var method = _method,
 		model = _model,
 		data = cast(_data, 'object', {});
 
-	fdb.open('.tmp/moldy-db', function (_error, _db) {
-		var query = _db.use(model.__name);
+	log(method, _data);
+	
+	MongoClient.connect('mongodb://127.0.0.1:27017/' + DEFAULT_DATABASE, function(err, db) {
+		if(err) {
+			return _callback(err);
+		}
+		var collectionName = _model.__name;
+
+		var collection = db.collection(collectionName);
+		log('collection', collectionName);
 
 		switch (true) {
-		case (/get/i.test(method)):
-			query
-				.find()
-				.exec(function (_error, _res) {
+			case (/get/i.test(method)): // $get or $collection
 
-					if (!_error) {
-						swapKeys(data, model.__key, fdbKey);
-						_res = _.where(_res, data || {});
-						_res.forEach(function (_item) {
-							swapKeys(_item, fdbKey, model.__key);
+				var data = moldyToMongo(_data);
+
+				var findOptions = {};
+
+
+				if (data._id) { //Get one item
+
+					collection.findOne({_id: new ObjectID(data._id)}, function(err, dbItem) {
+						if (err) {
+							return _callback(err);
+						}
+						if (!dbItem) {
+							//TODO: handle missing items better.
+							log('Missing item', _data, data, dbItem);
+							return _callback(null, null);
+						}
+						
+						dbItem = mongoToMoldy(dbItem);
+
+						log('$get res', dbItem);
+						
+						db.close();
+
+						_callback(null, dbItem);
+					});
+
+				} else { //Get collection of items
+
+					collection.find(data).toArray(function(err, dbItems) {
+						if (err) {
+							return _callback(err);
+						}
+
+						log('$collection pre-res', dbItems);
+
+						dbItems.forEach(function(dbItem) {
+							dbItem = mongoToMoldy(dbItem);							
 						});
+
+
+						log('$collection res', dbItems);
+						
+						db.close();
+
+						_callback(null, dbItems);
+					});
+
+				}
+
+				break;
+
+			case (/post/i.test(method)): //$create
+
+				var data = moldyToMongo(_data);
+
+				collection.insert(data, function(err, dbItems) {
+					if (err) {
+						return _callback(err);
+					}
+					if (dbItems.length !== 1) {
+						return _callback(new Error('MongoDb returned an unexpected amount of items on insert'));
 					}
 
-					_callback(_error, _res);
-				});
-			break;
-		case (/post/i.test(method)):
-			query
-				.save(data)
-				.exec(function (_error, _res) {
-					if (!_error) {
-						swapKeys(_res, fdbKey, model.__key);
-					}
-					_callback(_error, _res);
-				});
-			break;
-		case (/put/i.test(method)):
-			swapKeys(data, model.__key, fdbKey);
-			query
-				.save(data)
-				.exec(function (_error, _res) {
-					if (!_error) {
-						swapKeys(_res, fdbKey, model.__key);
-					}
-					_callback(_error, _res);
-				});
-			break;
-		case (/delete/i.test(method)):
-			var error;
+					var dbItem = dbItems[0];
 
-			fs.remove(__dirname + '/../.tmp/moldy-db/' + model.__name + '/' + model[model.__key], function (_error) {
-				_callback(error);
-			});
+					dbItem = mongoToMoldy(dbItem);
 
-			break;
+					log(method + ' res', dbItem);
+
+					db.close();
+
+					_callback(null, dbItem);
+
+				});
+				
+				break;
+
+			case (/put/i.test(method)): //$update
+				
+				//Copy and remove the id so mongo is happy
+				var data = moldyToMongo(_data);
+
+				collection.save(data, function(err, updateCount) {
+					if (err) {
+						return _callback(err);
+					}
+					if (updateCount != 1) {
+						return _callback(new Error('MongoDb returned an unexpected amount of items on save'));
+					}
+
+					log(method + ' res', updateCount);
+
+					db.close();
+
+					_callback(null, updateCount);
+
+				});
+
+				break;
+
+			case (/delete/i.test(method)): //$destroy
+
+				var data = moldyToMongo(_data);
+
+				collection.remove({_id: new ObjectID(data._id)}, function(err, count) {
+					if (err) {
+						return _callback(err);
+					}
+					
+					log(method + ' res', count);
+					
+					db.close();
+
+					_callback(null, count);
+				});
+				
+				break;
 		}
 
+
+
+		
 	});
 
-	// if (/get/i.test(method) && hasKey(data, model.__key) && new RegExp(data[model.__key]).test(url) === false) {
-	// 	url += '/' + data[model.__key];
-	// 	delete data[model.__key];
-	// }
-
-	// try {
-	// 	file.mkdirSync(__dirname + '/../.tmp');
-	// } catch(e) {};
+}
 
 
-	// try {
-	// 	file.openSync(model.$baseUrl() +  + model.__name)
-	// } catch(e) {
-	// 	console.log('open', e);
-	// }
+function log() {
+	if(LOGGING_ON){
+		console.log.apply(console, arguments);
+	}
+}
 
-	// request[method](url)[/get/i.test(method) ? 'query' : 'send'](data)
-	// 	.set(model.$headers())
-	// 	.type('json')
-	// 	.accept('json')
-	// 	.end(function(_error, _res) {
-	// 		var res = is.an.object(_res) ? _res : {},
-	// 			body = hasKey(_res, 'body') && (is.object(_res.body) || is.array(_res.body)) ? _res.body : null;
+//Swap IDs around to be moldy standard
+function mongoToMoldy(item) {
+	item.id = item._id.toString();
+	delete item['_id'];
+	return item;
+}
 
-	// 		if (res['ok'] !== true) {
-	// 			error = new Error('The response from the server was not OK');
-	// 		}
-
-	// 		if (body === null) {
-	// 			error = new Error('The response from the server contained an empty body');
-	// 		}
-
-	// 		_callback && _callback(error, body);
-
-	// 	});
-
+//Swap IDs to be mongo standard
+function moldyToMongo(item) {
+	var newItem = JSON.parse(JSON.stringify(item));
+	if (newItem.id) {		
+		newItem._id = newItem.id;
+		delete newItem['id'];
+	}
+	return newItem;	
 }

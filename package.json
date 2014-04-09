@@ -4,7 +4,7 @@
   "description": "A file adapter for `Moldy`",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha test/readme.js",
+    "test": "mocha --growl test/readme.js",
     "posttest": "mocha test/readme.js -R markdown > README.md"
   },
   "repository": {

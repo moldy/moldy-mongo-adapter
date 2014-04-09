@@ -4,18 +4,20 @@ var Moldy = require('moldy'),
 describe('create', function () {
 
 	it('should `create` by a property', function (_done) {
-		var personMoldy = new Moldy('person', {
+		var carMoldy = new Moldy('cars', {
 			properties: {
-				name: '',
-				age: ''
+				make: 'string',
+				model: 'string'
 			}
 		});
 
-		personMoldy.name = 'Glen';
+		carMoldy.make = 'Bugatti';
+		carMoldy.model = 'Veyron';
 
-		personMoldy.$save(function (_error) {
+		carMoldy.$save(function (_error) {
 
-			personMoldy.name.should.eql('Glen');
+			carMoldy.make.should.eql('Bugatti');
+			carMoldy.model.should.eql('Veyron');
 			_done(_error);
 
 		});

@@ -12,7 +12,8 @@ gulp.task("jshint", function () {
 });
 
 gulp.task('test', ['jshint'], function () {
-	return gulp.src('').pipe(shell(['npm test']));
+	return gulp.src('')
+		.pipe(shell(['npm test'], {ignoreErrors: true}));
 });
 
 gulp.task('watch', function () {

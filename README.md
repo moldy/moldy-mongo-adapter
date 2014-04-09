@@ -1,15 +1,130 @@
+post { id: undefined, make: 'Bugatti', model: 'Veyron' }
+post res { make: 'Bugatti',
+  model: 'Veyron',
+  id: '5345669c11b6b6401d7466d7' }
+post { id: undefined, name: 'Mr Glen' }
+post res { name: 'Mr Glen', id: '5345669c11b6b6401d7466d8' }
+get { id: '5345669c11b6b6401d7466d8' }
+$get res { name: 'Mr Glen', id: '5345669c11b6b6401d7466d8' }
+delete { id: '5345669c11b6b6401d7466d8', name: 'Mr Glen' }
+delete res 1
+get {}
+$collection res [ { make: 'Bugatti',
+    model: 'Veyron',
+    id: '53455ff3589b58da128ac080' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560670508e765130eb60f' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560ad8375f8b813a2441e' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560b57742b9f3131c24c0' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560c21896b33514afff8a' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560c2e7fae35b14322f03' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560d5c9ab4499147818b7' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560d571d3c8c514731bc6' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560e55b2a59fe14476174' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560e663cd752415d6977e' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560eb66698d5c1575415b' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534560ecf578868215d40905' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '53456107b431deda155eb11c' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534561a95edc117516df14d9' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534561ee8bb8bede16c1f320' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345624ee4c9a75817c2f4c8' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534562640170f6a71773ccdc' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '53456273c03b70ef1723769b' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534562bb7a6ed746186b6127' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534562c669fa9e8d18645ce2' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534562c9a98439d418f9cce3' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534563e5021c2091195cab38' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345642e7ac649151acb8efb' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534564b89fac67881a507181' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '534564d87ea999de1a8cffa3' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345661b504d29871b862c6b' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345663b0d7aacde1b2a3c35' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345666b7efe7e371c6ae860' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345668bd20f837f1c8dc25b' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345668cd22641b71c77805a' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345669c050471021da3d9b4' },
+  { make: 'Bugatti',
+    model: 'Veyron',
+    id: '5345669c11b6b6401d7466d7' } ]
+get {}
+$collection res [ { name: 'Mr Glen', id: '53455ff3589b58da128ac081' },
+  { name: 'Mr Glen', id: '534560ae8375f8b813a2441f' },
+  { name: 'Mr Glen', id: '534560b57742b9f3131c24c1' },
+  { name: 'Mr Glen', age: null, id: '53455ff3589b58da128ac081' } ]
+put { id: '53455ff3589b58da128ac081', name: 'Mr Glen', age: null }
+put res 1
+get { id: '53455ff3589b58da128ac081' }
+$get res { name: 'Mr Glen', id: '53455ff3589b58da128ac081' }
 # TOC
    - [moldy-mongo-adapter](#moldy-mongo-adapter)
      - [create](#moldy-mongo-adapter-create)
      - [get](#moldy-mongo-adapter-get)
      - [collection](#moldy-mongo-adapter-collection)
      - [save](#moldy-mongo-adapter-save)
-     - [destroy](#moldy-mongo-adapter-destroy)
 <a name=""></a>
  
 <a name="moldy-mongo-adapter"></a>
 # moldy-mongo-adapter
-Tell `Moldy` to use the `file` adapter.
+Tell `Moldy` to use the `mongo` adapter.
 
 ```js
 // Moldy.use( require('moldy-mongo-adapter') );
@@ -20,15 +135,17 @@ Tell `Moldy` to use the `file` adapter.
 should `create` by a property.
 
 ```js
-var personMoldy = new Moldy('person', {
+var carMoldy = new Moldy('cars', {
 	properties: {
-		name: '',
-		age: ''
+		make: 'string',
+		model: 'string'
 	}
 });
-personMoldy.name = 'Glen';
-personMoldy.$save(function (_error) {
-	personMoldy.name.should.eql('Glen');
+carMoldy.make = 'Bugatti';
+carMoldy.model = 'Veyron';
+carMoldy.$save(function (_error) {
+	carMoldy.make.should.eql('Bugatti');
+	carMoldy.model.should.eql('Veyron');
 	_done(_error);
 });
 ```
@@ -76,24 +193,24 @@ personMoldy.$get({
 should `get` a `collection`.
 
 ```js
-var personMoldy = new Moldy('person', {
+var carMoldy = new Moldy('cars', {
 	properties: {
-		name: 'string',
-		age: 'number'
+		make: 'string',
+		model: 'string'
 	}
 });
-personMoldy.$collection(function (_error, _people) {
+carMoldy.$collection(function (_error, _cars) {
 	if (_error) {
 		return _done(_error);
 	}
-	_people.should.be.an.Array;
-	_people.length.should.greaterThan(0);
-	_people.forEach(function (_person) {
-		_person.should.be.a.Moldy;
-		_person.should.have.a.property('id');
-		_person.should.have.a.property('name');
-		_person.should.have.a.property('age');
-		Object.keys(_person.$json()).should.have.a.lengthOf(3);
+	_cars.should.be.an.Array;
+	_cars.length.should.greaterThan(0);
+	_cars.forEach(function (_car) {
+		_car.should.be.a.Moldy;
+		_car.should.have.a.property('id');
+		_car.should.have.a.property('make');
+		_car.should.have.a.property('model');
+		Object.keys(_car.$json()).should.have.a.lengthOf(3);
 	});
 	_done();
 });
@@ -133,49 +250,6 @@ personMoldy.$get(function (_error) {
 			_done(_error);
 		});
 	});
-});
-```
-
-<a name="moldy-mongo-adapter-destroy"></a>
-## destroy
-define a JSON schema.
-
-```js
-schema = {
-	properties: {
-		name: 'string'
-	}
-};
-```
-
-should `destroy` all the models.
-
-```js
-var personMoldy = new Moldy('person', schema);
-personMoldy.$collection(function (_error, _guys) {
-	_guys.length.should.be.greaterThan(0);
-	var deleteGuy = function (_guy) {
-		personMoldy.$collection(function (_error, _guys) {
-			if (_guys.length === 0) {
-				return _done();
-			}
-			var guy = new Moldy('person', schema);
-			guy.$get({
-				id: _guys[0].id
-			}, function (_error) {
-				if (_error) {
-					return _done(_error);
-				}
-				guy.$destroy(function (_error) {
-					if (_error) {
-						return _done(_error);
-					}
-					deleteGuy();
-				});
-			});
-		});
-	};
-	deleteGuy();
 });
 ```
 
