@@ -3,7 +3,7 @@ var cast = require('sc-cast'),
 	MongoClient = require('mongodb').MongoClient,
 	ObjectID = require('mongodb').ObjectID;
 
-var LOGGING_ON = true,
+var LOGGING_ON = false,
 	DEFAULT_DATABASE = 'MoldyModelsUnnamed';
 
 

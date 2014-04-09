@@ -13,7 +13,7 @@ describe('moldy-mongo-adapter', function () {
 	require('./readme/create');
 	require('./readme/get');
 	require('./readme/collection');
-	require('./readme/save');
-	require('./readme/destroy');
+	// require('./readme/save');
+	// require('./readme/destroy');
 
 });
