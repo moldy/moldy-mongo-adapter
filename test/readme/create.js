@@ -3,21 +3,24 @@ var Moldy = require('moldy'),
 
 describe('create', function () {
 
+	before(function () {
+		Moldy.use(require('../../src'));
+		Moldy.adapters.mongodb.config.databaseName = 'moldyMongoAdapterTests';
+	});
+
 	it('should `create` by a property', function (_done) {
-		var carMoldy = new Moldy('cars', {
+		var personMoldy = Moldy.extend('person', {
 			properties: {
-				make: 'string',
-				model: 'string'
+				name: '',
+				age: ''
 			}
-		});
+		}).create();
 
-		carMoldy.make = 'Bugatti';
-		carMoldy.model = 'Veyron';
+		personMoldy.name = 'David';
 
-		carMoldy.$save(function (_error) {
+		personMoldy.$save(function (_error) {
 
-			carMoldy.make.should.eql('Bugatti');
-			carMoldy.model.should.eql('Veyron');
+			personMoldy.name.should.eql('David');
 			_done(_error);
 
 		});
