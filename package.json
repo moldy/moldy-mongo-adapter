@@ -1,38 +1,38 @@
 {
-	"name": "moldy-mongo-adapter",
-	"version": "0.0.8",
-	"description": "A file adapter for `Moldy`",
-	"main": "src/index.js",
-	"scripts": {
-		"test": "mocha test/readme.js",
-		"posttest": "mocha test/readme.js -R markdown > README.md"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/moldy/moldy-mongo-adapter"
-	},
-	"author": "Glen Arrowsmith",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/moldy/moldy-mongo-adapter/issues"
-	},
-	"homepage": "https://github.com/moldy/moldy-mongo-adapter",
-	"dependencies": {
-		"mongodb": "^1.4.0",
-		"sc-is": "0.0.3",
-		"sc-haskey": "0.0.2",
-		"sc-cast": "0.0.4",
-		"underscore": "^1.6.0",
-		"moldy-base-adapter": "0.0.4"
-	},
-	"devDependencies": {
-		"moldy": "*",
-		"mocha": "^1.18.2",
-		"should": "^3.1.4",
-		"gulp": "^3.5.6",
-		"gulp-shell": "^0.2.4",
-		"underscore": "^1.6.0",
-		"gulp-jshint": "^1.5.3",
-		"jshint-stylish": "^0.1.5"
-	}
+  "name": "moldy-mongo-adapter",
+  "version": "1.0.0",
+  "description": "A file adapter for `Moldy`",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha test/readme.js",
+    "posttest": "mocha test/readme.js -R markdown > README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moldy/moldy-mongo-adapter"
+  },
+  "author": "Glen Arrowsmith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/moldy/moldy-mongo-adapter/issues"
+  },
+  "homepage": "https://github.com/moldy/moldy-mongo-adapter",
+  "dependencies": {
+    "mongodb": "^1.4.0",
+    "sc-is": "0.0.3",
+    "sc-haskey": "0.0.2",
+    "sc-cast": "0.0.4",
+    "underscore": "^1.6.0",
+    "moldy-base-adapter": "0.0.4"
+  },
+  "devDependencies": {
+    "moldy": "*",
+    "mocha": "^1.18.2",
+    "should": "^3.1.4",
+    "gulp": "^3.5.6",
+    "gulp-shell": "^0.2.4",
+    "underscore": "^1.6.0",
+    "gulp-jshint": "^1.5.3",
+    "jshint-stylish": "^0.1.5"
+  }
 }
