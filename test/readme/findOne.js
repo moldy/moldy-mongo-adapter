@@ -52,6 +52,20 @@ describe('get', function () {
 		});
 	});
 
+	it('should handle invalid ids', function (_done) {
+		var personMoldy = Moldy.extend('person', schema);
+
+		personMoldy.$findOne({
+			id: 'invalid id'
+		}, function (_error) {
+
+			_error.should.be.an.Error;
+			_done();
+
+		});
+
+	});
+
 	it('should `get` by a `id` from the previous example', function (_done) {
 		var personMoldy = Moldy.extend('person', schema);
 

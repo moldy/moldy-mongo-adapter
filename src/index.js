@@ -88,25 +88,26 @@ module.exports = baseAdapter.extend({
 			col;
 
 		connect.call(this.__adapter.mongodb, function (err, db) {
+			var id = typeof query === 'object' && query.id ? query.id : '';
+
 			if (err) {
 				return done(err);
 			}
+
 			col = getCollection.call(self, db);
 
-			if (query.id) {
+			try {
 				query = {
-					_id: new ObjectID(query.id)
+					_id: new ObjectID(id)
 				}
-			}
+			} catch (e) {}
 
 			col.findOne(query, function (err, dbItem) {
 				if (err) {
 					return done(err);
 				}
 				if (!dbItem) {
-					//TODO: handle missing items better.
-					log('Missing item', _data, data, dbItem);
-					return done(null, null);
+					return done(new Error('The item {' + id + '} could not be found'), undefined);
 				}
 
 				dbItem = mongoToMoldy(dbItem);
