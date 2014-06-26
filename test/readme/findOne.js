@@ -5,9 +5,13 @@ describe('get', function () {
 	var newPersonId,
 		schema;
 
+	this.timeout(5000);
+	this.slow(5000);
+
 	before(function () {
 		Moldy.use(require('../../src'));
 		Moldy.adapters.mongodb.config.databaseName = 'moldyMongoAdapterTests';
+		// Moldy.adapters.mongodb.config.connectionString = 'mongodb://david:david@kahana.mongohq.com:10021/';
 	});
 
 	it('define a JSON schema', function () {

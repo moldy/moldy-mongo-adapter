@@ -1,36 +1,30 @@
-var cast = require('sc-cast'),
-	hasKey = require('sc-haskey'),
-	MongoClient = require('mongodb').MongoClient,
+var MongoClient = require('mongodb').MongoClient,
 	baseAdapter = require('moldy-base-adapter'),
 	ObjectID = require('mongodb').ObjectID;
 
-var LOGGING_ON = false,
-	DEFAULT_DATABASE = 'MoldyModelsUnnamed';
-
 var config = {
 	connectionString: 'mongodb://127.0.0.1:27017/',
-	databaseName: DEFAULT_DATABASE
+	databaseName: 'MoldyModelsUnnamed'
 };
 
-var url = config.connectionString + config.databaseName;
+var db;
 
 var connect = function (callback) {
-
 	var cs = this.config.connectionString ? this.config.connectionString : config.connectionString,
 		dbName = this.config.databaseName ? this.config.databaseName : config.databaseName;
 
-	MongoClient.connect(cs + dbName, callback);
+	if (db) return callback(null, db);
+
+	MongoClient.connect(cs + dbName, function (_error, _db) {
+		if (_error) return callback(_error);
+		db = _db;
+		callback(null, db);
+	});
 };
 
 var getCollection = function (db) {
 	return db.collection(this.__name);
 };
-
-function log() {
-	if (LOGGING_ON) {
-		console.log.apply(console, arguments);
-	}
-}
 
 //Swap IDs around to be moldy standard
 function mongoToMoldy(item) {
@@ -55,30 +49,18 @@ module.exports = baseAdapter.extend({
 		var self = this,
 			col;
 
-		connect.call(this.__adapter.mongodb, function (err, db) {
-			if (err) {
-				return done(err);
-			}
+		connect.call(self.__adapter.mongodb, function (err, db) {
+			if (err) return done(err);
 
 			col = getCollection.call(self, db);
 
 			col.insert(moldyToMongo(data), function (err, dbItems) {
-
-
-				if (err) {
-					return done(err);
-				}
-
-				if (dbItems.length !== 1) {
-					return done(new Error('MongoDb returned an unexpected amount of items on insert'));
-				}
+				if (err) return done(err);
+				if (dbItems.length !== 1) return done(new Error('MongoDb returned an unexpected amount of items on insert'));
 
 				var dbItem = mongoToMoldy(dbItems[0]);
 
-				db.close();
-
 				done(null, dbItem);
-
 			});
 
 		});
@@ -87,34 +69,25 @@ module.exports = baseAdapter.extend({
 		var self = this,
 			col;
 
-		connect.call(this.__adapter.mongodb, function (err, db) {
-			var id = typeof query === 'object' && query.id ? query.id : '';
+		connect.call(self.__adapter.mongodb, function (err, db) {
+			if (err) return done(err);
 
-			if (err) {
-				return done(err);
-			}
+			var id = typeof query === 'object' && query.id ? query.id : '';
 
 			col = getCollection.call(self, db);
 
-			try {
-				query = {
-					_id: new ObjectID(id)
-				}
-			} catch (e) {}
+			if (query.id) {
+				try {
+					query._id = new ObjectID(id);
+					delete query.id;
+				} catch (e) {}
+			}
 
 			col.findOne(query, function (err, dbItem) {
-				if (err) {
-					return done(err);
-				}
-				if (!dbItem) {
-					return done(new Error('The item {' + id + '} could not be found'), undefined);
-				}
+				if (err) return done(err);
+				if (!dbItem) return done(new Error('The item {' + id + '} could not be found'), undefined);
 
 				dbItem = mongoToMoldy(dbItem);
-
-				log('$get res', dbItem);
-
-				db.close();
 
 				done(null, dbItem);
 			});
@@ -124,7 +97,7 @@ module.exports = baseAdapter.extend({
 		var self = this,
 			col;
 
-		connect.call(this.__adapter.mongodb, function (err, db) {
+		connect.call(self.__adapter.mongodb, function (err, db) {
 			if (err) {
 				return done(err);
 			}
@@ -132,21 +105,11 @@ module.exports = baseAdapter.extend({
 			col = getCollection.call(self, db);
 
 			col.find(query || {}).toArray(function (err, dbItems) {
-
-				if (err) {
-					return done(err);
-				}
-
-				log('$collection pre-res', dbItems);
+				if (err) return done(err);
 
 				dbItems.forEach(function (dbItem) {
 					dbItem = mongoToMoldy(dbItem);
 				});
-
-
-				log('$collection res', dbItems);
-
-				db.close();
 
 				done(null, dbItems);
 			});
@@ -156,25 +119,16 @@ module.exports = baseAdapter.extend({
 		var self = this,
 			col;
 
-		connect.call(this.__adapter.mongodb, function (err, db) {
-			if (err) {
-				return done(err);
-			}
+		connect.call(self.__adapter.mongodb, function (err, db) {
+			if (err) return done(err);
 
 			col = getCollection.call(self, db);
 
-			//Copy and remove the id so mongo is happy
 			data = moldyToMongo(data);
 
 			col.save(data, function (err, updateCount) {
-				if (err) {
-					return done(err);
-				}
-				if (updateCount != 1) {
-					return done(new Error('MongoDb returned an unexpected amount of items on save'));
-				}
-
-				db.close();
+				if (err) return done(err);
+				if (updateCount != 1) return done(new Error('MongoDb returned an unexpected amount of items on save'));
 
 				done(null, updateCount);
 			});
@@ -184,23 +138,16 @@ module.exports = baseAdapter.extend({
 		var self = this,
 			col;
 
-		connect.call(this.__adapter.mongodb, function (err, db) {
-			if (err) {
-				return done(err);
-			}
+		connect.call(self.__adapter.mongodb, function (err, db) {
+			if (err) return done(err);
 
 			col = getCollection.call(self, db);
-
 			data = moldyToMongo(data);
 
 			col.remove({
 				_id: new ObjectID(data._id)
 			}, function (err, count) {
-				if (err) {
-					return done(err);
-				}
-
-				db.close();
+				if (err) return done(err);
 
 				done(null, count);
 			});
