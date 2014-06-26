@@ -13,6 +13,8 @@ Tell `Moldy` to use the `mongo` adapter.
 
 ```js
 // Moldy.use( require('moldy-mongo-adapter') );
+// Moldy.adapters.mongodb.config.databaseName = 'moldyMongoAdapterTests';
+// Moldy.adapters.mongodb.config.connectionString = 'mongodb://127.0.0.1:27017/';
 ```
 
 <a name="moldy-mongo-adapter-create"></a>
@@ -73,6 +75,18 @@ personMoldy.friends.push({
 personMoldy.$save(function (_error) {
 	newPersonId = personMoldy.id;
 	_done(_error);
+});
+```
+
+should handle invalid ids.
+
+```js
+var personMoldy = Moldy.extend('person', schema);
+personMoldy.$findOne({
+	id: 'invalid id'
+}, function (_error) {
+	_error.should.be.an.Error;
+	_done();
 });
 ```
 
