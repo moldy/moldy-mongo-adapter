@@ -78,14 +78,15 @@ personMoldy.$save(function (_error) {
 });
 ```
 
-should handle invalid ids.
+should handle not found items.
 
 ```js
 var personMoldy = Moldy.extend('person', schema);
 personMoldy.$findOne({
-	id: 'invalid id'
-}, function (_error) {
-	_error.should.be.an.Error;
+	id: 'non-existant id'
+}, function (_error, _item) {
+	should.not.exist(_error);
+	should(_item).eql(undefined);
 	_done();
 });
 ```

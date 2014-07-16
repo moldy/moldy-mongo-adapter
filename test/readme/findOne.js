@@ -64,8 +64,8 @@ describe('get', function () {
 		}, function (_error, _item) {
 
 			should.not.exist(_error);
-			should.not.exist(_item);
-			
+			should(_item).eql(undefined);
+
 			_done();
 
 		});
