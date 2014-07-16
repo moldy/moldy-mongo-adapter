@@ -56,14 +56,16 @@ describe('get', function () {
 		});
 	});
 
-	it('should handle invalid ids', function (_done) {
+	it('should handle not found items', function (_done) {
 		var personMoldy = Moldy.extend('person', schema);
 
 		personMoldy.$findOne({
-			id: 'invalid id'
-		}, function (_error) {
+			id: 'non-existant id'
+		}, function (_error, _item) {
 
-			_error.should.be.an.Error;
+			should.not.exist(_error);
+			should.not.exist(_item);
+			
 			_done();
 
 		});

@@ -85,7 +85,10 @@ module.exports = baseAdapter.extend({
 
 			col.findOne(query, function (err, dbItem) {
 				if (err) return done(err);
-				if (!dbItem) return done(new Error('The item {' + id + '} could not be found'), undefined);
+				
+				if (!dbItem) {
+					return done(null, undefined);
+				}
 
 				dbItem = mongoToMoldy(dbItem);
 
