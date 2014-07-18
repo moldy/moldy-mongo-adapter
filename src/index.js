@@ -77,10 +77,10 @@ module.exports = baseAdapter.extend({
 			col = getCollection.call(self, db);
 
 			if (query.id) {
-				try {
+				if (ObjectID.isValid(id)) {
 					query._id = new ObjectID(id);
 					delete query.id;
-				} catch (e) {}
+				}
 			}
 
 			col.findOne(query, function (err, dbItem) {
