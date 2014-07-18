@@ -139,17 +139,22 @@ module.exports = baseAdapter.extend({
 	},
 	destroy: function (data, done) {
 		var self = this,
-			col;
+			col,
+			query = {};
+
+		if (ObjectID.isValid(data.id)) {
+			query._id = new ObjectID(data.id);
+		} else {
+			//TODO: Add support for query deletes.
+			return done(null, 0);
+		}
 
 		connect.call(self.__adapter.mongodb, function (err, db) {
 			if (err) return done(err);
 
 			col = getCollection.call(self, db);
-			data = moldyToMongo(data);
 
-			col.remove({
-				_id: new ObjectID(data._id)
-			}, function (err, count) {
+			col.remove(query, function (err, count) {
 				if (err) return done(err);
 
 				done(null, count);
