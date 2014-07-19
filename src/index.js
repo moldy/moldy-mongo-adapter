@@ -36,11 +36,15 @@ function mongoToMoldy(item) {
 //Swap IDs to be mongo standard
 function moldyToMongo(item) {
 	var newItem = JSON.parse(JSON.stringify(item));
-	if (newItem.id) {
+
+	if (ObjectID.isValid(newItem.id)) {
 		newItem._id = new ObjectID(newItem.id);
-		delete newItem['id'];
+		delete newItem.id;
+	} else {
+		return done(new Error('The given id {' + newItem.id + '} is invalid'), 0);
 	}
-	return newItem;
+
+	return newItem._id ? newItem : null;
 }
 
 module.exports = baseAdapter.extend({
@@ -54,7 +58,11 @@ module.exports = baseAdapter.extend({
 
 			col = getCollection.call(self, db);
 
-			col.insert(moldyToMongo(data), function (err, dbItems) {
+			data = moldyToMongo(data);
+
+			if (!data) return done(new Error('The given id {' + data.id + '} is invalid'), 0);
+
+			col.insert(data, function (err, dbItems) {
 				if (err) return done(err);
 				if (dbItems.length !== 1) return done(new Error('MongoDb returned an unexpected amount of items on insert'));
 
@@ -85,7 +93,7 @@ module.exports = baseAdapter.extend({
 
 			col.findOne(query, function (err, dbItem) {
 				if (err) return done(err);
-				
+
 				if (!dbItem) {
 					return done(null, undefined);
 				}
@@ -128,6 +136,8 @@ module.exports = baseAdapter.extend({
 			col = getCollection.call(self, db);
 
 			data = moldyToMongo(data);
+
+			if (!data) return done(new Error('The given id {' + data.id + '} is invalid'), 0);
 
 			col.save(data, function (err, updateCount) {
 				if (err) return done(err);
