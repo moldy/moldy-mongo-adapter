@@ -10,27 +10,22 @@ var config = {
 var db;
 
 var connect = function (callback) {
-	var cs = this.config.connectionString ? this.config.connectionString : config.connectionString,
-			dbName = this.config.databaseName ? this.config.databaseName : config.databaseName;
+	var self = this,
+		cs = self.config.connectionString ? self.config.connectionString : config.connectionString,
+		dbName = self.config.databaseName ? self.config.databaseName : config.databaseName;
 
 	if (db) return callback(null, db);
 
-	var adapter = this;
 	MongoClient.connect(cs + dbName, function (_error, _db) {
 		if (_error) return callback(_error);
-			
-		db = _db;
-		adapter._db = _db;
-		
+		db = self._db = _db;
 		callback(null, db);
 	});
 };
 
-
 var getCollection = function (db) {
 	return db.collection(this.__name);
 };
-
 
 //Swap IDs around to be moldy standard
 function mongoToMoldy(item) {
@@ -53,11 +48,8 @@ function moldyToMongo(item) {
 	return newItem._id ? newItem : null;
 }
 
-
-
 module.exports = baseAdapter.extend({
 	name: "mongodb",
-	
 	create: function (data, done) {
 		var self = this,
 			col;
@@ -115,47 +107,46 @@ module.exports = baseAdapter.extend({
 	},
 	find: function (query, done) {
 		var self = this,
-				col;
+			col;
 
 		connect.call(self.__adapter.mongodb, function (err, db) {
-			if (err) {
-				return done(err);
-			}
+			if (err) return done(err);
 
 			col = getCollection.call(self, db);
-			
+
 			// extract any page/ordering options
-			var orderBy,
-					page,
-					perPage;
-					
-			if (query.orderBy) {
-				orderBy = query.orderBy;
-				delete query.orderBy;
+			var field,
+				fields = {},
+				orderBy,
+				page,
+				perPage;
+
+			if (query.__orderBy) {
+				orderBy = query.__orderBy;
+				delete query.__orderBy;
 			}
-			if (query.page) {
-				page = parseInt(query.page, 10);
+			if (query.__page) {
+				page = parseInt(query.__page, 10);
 				perPage = 20;
-				delete query.page;
+				delete query.__page;
 			}
-			if (query.perPage) {
-				perPage = parseInt(query.perPage, 10);
-				delete query.perPage;
+			if (query.__perPage) {
+				perPage = parseInt(query.__perPage, 10);
+				delete query.__perPage;
 			}
-			
+
 			var cursor = col.find(query || {});
-			
+
 			// page out results
 			if (page) {
 				cursor.skip((page - 1) * perPage).limit(perPage);
 			}
-			
+
 			// ordering
 			if (orderBy) {
-				var fields = {},
-						field;
-				
+
 				orderBy = orderBy.split(',');
+
 				for (var i = 0; i < orderBy.length; i++) {
 					if (orderBy.hasOwnProperty(i)) {
 						field = orderBy[i];
@@ -167,10 +158,10 @@ module.exports = baseAdapter.extend({
 						}
 					}
 				}
-				
+
 				cursor.sort(fields);
 			}
-			
+
 			cursor.toArray(function (err, dbItems) {
 				if (err) return done(err);
 

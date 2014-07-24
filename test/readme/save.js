@@ -11,7 +11,6 @@ describe('save', function () {
 	before(function () {
 		Moldy.use(require('../../src'));
 		Moldy.adapters.mongodb.config.databaseName = 'moldyMongoAdapterTests';
-		// Moldy.adapters.mongodb.config.connectionString = 'mongodb://david:david@kahana.mongohq.com:10021/';
 	});
 
 	it('create a schema', function () {
