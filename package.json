@@ -1,6 +1,6 @@
 {
   "name": "moldy-mongo-adapter",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "A file adapter for `Moldy`",
   "main": "src/index.js",
   "scripts": {
