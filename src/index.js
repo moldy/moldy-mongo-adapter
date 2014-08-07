@@ -40,8 +40,9 @@ function moldyToMongo(item) {
 
 	if (ObjectID.isValid(newItem.id)) {
 		newItem._id = new ObjectID(newItem.id);
-		delete newItem.id;
 	}
+
+	delete newItem.id;
 
 	return newItem._id ? newItem : null;
 }
@@ -56,6 +57,8 @@ module.exports = baseAdapter.extend({
 			if (err) return done(err);
 
 			col = getCollection.call(self, db);
+
+			delete data.id;
 
 			col.insert(data, function (err, dbItems) {
 				if (err) return done(err);
