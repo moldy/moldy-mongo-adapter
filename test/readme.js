@@ -1,9 +1,8 @@
 var Moldy = require('moldy'),
-  	should = require('should');
-
+	should = require('should');
 
 describe('moldy-mongo-adapter', function () {
-	
+
 	require('./readme/create');
 	require('./readme/findOne');
 	require('./readme/find');

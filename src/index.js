@@ -41,8 +41,6 @@ function moldyToMongo(item) {
 	if (ObjectID.isValid(newItem.id)) {
 		newItem._id = new ObjectID(newItem.id);
 		delete newItem.id;
-	} else {
-		return done(new Error('The given id {' + newItem.id + '} is invalid'), 0);
 	}
 
 	return newItem._id ? newItem : null;
@@ -58,10 +56,6 @@ module.exports = baseAdapter.extend({
 			if (err) return done(err);
 
 			col = getCollection.call(self, db);
-
-			data = moldyToMongo(data);
-
-			if (!data) return done(new Error('The given id {' + data.id + '} is invalid'), 0);
 
 			col.insert(data, function (err, dbItems) {
 				if (err) return done(err);
