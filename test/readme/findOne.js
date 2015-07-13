@@ -85,7 +85,8 @@ describe('get', function () {
 			var david = _david;
 
 			david.name.should.eql('Mr David');
-			david.friends.should.be.an.Array.and.have.a.lengthOf(2);
+			david.friends.should.be.an.Array;
+			david.friends.should.have.a.lengthOf(2);
 			david.friends[0].name.should.equal('leonie');
 			david.friends[0].age.should.equal(33);
 			david.friends[1].name.should.equal('max');

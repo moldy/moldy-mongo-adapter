@@ -62,9 +62,9 @@ module.exports = baseAdapter.extend({
 
 			col.insert(data, function (err, dbItems) {
 				if (err) return done(err);
-				if (dbItems.length !== 1) return done(new Error('MongoDb returned an unexpected amount of items on insert'));
+				if (dbItems.ops.length !== 1) return done(new Error('MongoDb returned an unexpected amount of items on insert'));
 
-				var dbItem = mongoToMoldy(dbItems[0]);
+				var dbItem = mongoToMoldy(dbItems.ops[0]);
 
 				done(null, dbItem);
 			});
@@ -170,9 +170,11 @@ module.exports = baseAdapter.extend({
 			});
 		});
 	},
-	save: function (data, done) {
+	save: function (data, isDirectOperation, done) {
 		var self = this,
-			col;
+			col,
+			done = arguments[arguments.length-1],
+			isDirectOperation = typeof isDirectOperation === 'function' ? false : isDirectOperation;
 
 		connect.call(self.__adapter.mongodb, function (err, db) {
 			if (err) return done(err);
@@ -181,14 +183,33 @@ module.exports = baseAdapter.extend({
 
 			data = moldyToMongo(data);
 
-			if (!data) return done(new Error('The given id {' + data.id + '} is invalid'), 0);
+			if (!data) return done(new Error('Can not save data that has no id'), 0);
 
-			col.save(data, function (err, updateCount) {
-				if (err) return done(err);
-				if (updateCount != 1) return done(new Error('MongoDb returned an unexpected amount of items on save'));
+			var options = {
+				remove: false,
+				new: true, //returns the modified record
+				upsert: false
+			};
 
-				done(null, updateCount);
-			});
+			var _id = data._id;
+			var updateQuery = {$set:data};
+
+			if (isDirectOperation) {
+				delete data['_id'];
+				updateQuery = data;
+			}
+
+			col.findAndModify(
+				{ _id: _id }, // query
+				[['_id','asc']],	// sort order
+				updateQuery,
+				options,
+				function (err, updateResponse) {
+					if (err) return done(err);
+					if (updateResponse.ok !== 1) return done(new Error('MongoDb returned an unexpected amount of items on save: ' + updateCount));
+					done(null, updateResponse.value);
+				}
+			);
 		});
 	},
 	destroy: function (data, done) {

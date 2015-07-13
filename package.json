@@ -18,17 +18,17 @@
   },
   "homepage": "https://github.com/moldy/moldy-mongo-adapter",
   "dependencies": {
-    "mongodb": "^1.4.7",
-    "moldy-base-adapter": "0.0.4"
+    "moldy-base-adapter": "0.0.4",
+    "mongodb": "^2.0.36"
   },
   "devDependencies": {
-    "moldy": "*",
-    "mocha": "^1.18.2",
-    "should": "^3.1.4",
+    "async": "0.9.x",
     "gulp": "^3.5.6",
-    "gulp-shell": "^0.2.4",
     "gulp-jshint": "^1.5.3",
+    "gulp-shell": "^0.2.4",
     "jshint-stylish": "^0.1.5",
-    "async": "0.9.x"
+    "mocha": "^2.2.5",
+    "moldy": "*",
+    "should": "^7.0.2"
   }
 }
