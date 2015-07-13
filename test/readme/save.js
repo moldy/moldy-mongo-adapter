@@ -30,7 +30,7 @@ describe('save', function () {
 						},
 						age: {
 							type: 'number',
-							default: ''
+							default: 0
 						}
 					}
 				}]
@@ -92,6 +92,54 @@ describe('save', function () {
 						});
 					});
 
+				});
+
+			});
+
+		});
+	});
+
+	it('should bypass moldy and do an $inc operation', function (_done) {
+		var personMoldy = Moldy.extend('person', schema);
+
+		personMoldy.$findOne({
+			id: key
+		}, function (_error, _person) {
+
+			if (_error) {
+				return _done(_error);
+			}
+
+			_person.age.should.eql(0);
+			_person.friends[0].age.should.eql(0);
+
+			specialUpdate = {
+				id : _person.id,
+				$inc: {
+					age: 1
+				}
+			};
+
+
+			_person.$save(specialUpdate, function (_error, _updatedUser) {
+
+				if (_error) {
+					return _done(_error);
+				}
+
+				_updatedUser.age.should.eql(1);
+				_person.age.should.eql(1);
+
+				var newPersonMoldy = Moldy.extend('person', schema);
+
+				newPersonMoldy.$findOne({
+					id: key
+				}, function (_error, newPerson) {
+
+					newPerson.id.should.equal(key);
+					newPerson.age.should.eql(1);
+
+					_done(_error);
 				});
 
 			});

@@ -95,7 +95,8 @@ personMoldy.$findOne({
 	}
 	var david = _david;
 	david.name.should.eql('Mr David');
-	david.friends.should.be.an.Array.and.have.a.lengthOf(2);
+	david.friends.should.be.an.Array;
+	david.friends.should.have.a.lengthOf(2);
 	david.friends[0].name.should.equal('leonie');
 	david.friends[0].age.should.equal(33);
 	david.friends[1].name.should.equal('max');
@@ -261,7 +262,7 @@ schema = {
 				},
 				age: {
 					type: 'number',
-					default: ''
+					default: 0
 				}
 			}
 		}]
@@ -299,6 +300,7 @@ personMoldy.$findOne(function (_error, _person) {
 		}, function (_error, newPerson) {
 			newPerson.id.should.equal(key);
 			newPerson.friends.splice(1, 1);
+
 			newPerson.$save(function (_error) {
 				if (_error) {
 					return _done(_error);
@@ -312,6 +314,43 @@ personMoldy.$findOne(function (_error, _person) {
 					_done();
 				});
 			});
+		});
+	});
+});
+```
+
+should bypass moldy and do an $inc operation.
+
+```js
+var personMoldy = Moldy.extend('person', schema);
+personMoldy.$findOne({
+	id: key
+}, function (_error, _person) {
+	if (_error) {
+		return _done(_error);
+	}
+	_person.age.should.eql(0);
+	_person.friends[0].age.should.eql(0);
+	specialUpdate = {
+		id : _person.id,
+		$inc: {
+			age: 1
+		}
+	};
+
+	_person.$save(specialUpdate, function (_error, _updatedUser) {
+		if (_error) {
+			return _done(_error);
+		}
+		_updatedUser.age.should.eql(1);
+		_person.age.should.eql(1);
+		var newPersonMoldy = Moldy.extend('person', schema);
+		newPersonMoldy.$findOne({
+			id: key
+		}, function (_error, newPerson) {
+			newPerson.id.should.equal(key);
+			newPerson.age.should.eql(1);
+			_done(_error);
 		});
 	});
 });
