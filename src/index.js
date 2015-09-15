@@ -4,7 +4,10 @@ var MongoClient = require('mongodb').MongoClient,
 
 var config = {
 	connectionString: 'mongodb://127.0.0.1:27017/',
-	databaseName: 'MoldyModelsUnnamed'
+	databaseName: 'MoldyModelsUnnamed',
+	options: {
+		server: {}
+	}
 };
 
 var db;
@@ -12,11 +15,11 @@ var db;
 var connect = function (callback) {
 	var self = this,
 		cs = self.config.connectionString ? self.config.connectionString : config.connectionString,
-		dbName = self.config.databaseName ? self.config.databaseName : config.databaseName;
+		dbName = self.config.databaseName ? self.config.databaseName : config.databaseName,
+		options = self.config.options ? self.config.options : config.options;
 
 	if (db) return callback(null, db);
-
-	MongoClient.connect(cs + dbName, function (_error, _db) {
+	MongoClient.connect(cs + dbName, options, function (_error, _db) {
 		if (_error) return callback(_error);
 		db = self._db = _db;
 		callback(null, db);
