@@ -135,7 +135,12 @@ module.exports = baseAdapter.extend({
 				delete query.__perPage;
 			}
 
-			var cursor = col.find(query || {});
+			var cursor;
+			if (typeof orderBy !== 'object') {
+				cursor = col.find(query || {});
+			} else {
+				cursor = col.find(query || {}, orderBy);
+			}
 
 			// page out results
 			if (page) {
@@ -144,22 +149,25 @@ module.exports = baseAdapter.extend({
 
 			// ordering
 			if (orderBy) {
+				if (typeof orderBy !== 'object') {
+					orderBy = orderBy.split(',');
 
-				orderBy = orderBy.split(',');
-
-				for (var i = 0; i < orderBy.length; i++) {
-					if (orderBy.hasOwnProperty(i)) {
-						field = orderBy[i];
-						// could be 'field' or '-field'
-						if (field.match(/^\-/)) {
-							fields[field.replace(/^\-/, '')] = -1;
-						} else {
-							fields[field] = 1;
+					for (var i = 0; i < orderBy.length; i++) {
+						if (orderBy.hasOwnProperty(i)) {
+							field = orderBy[i];
+							// could be 'field' or '-field'
+							if (field.match(/^\-/)) {
+								fields[field.replace(/^\-/, '')] = -1;
+							} else {
+								fields[field] = 1;
+							}
 						}
 					}
+					cursor.sort(fields);
+				} else {
+					cursor.sort(orderBy);
 				}
 
-				cursor.sort(fields);
 			}
 
 			cursor.toArray(function (err, dbItems) {
@@ -176,7 +184,7 @@ module.exports = baseAdapter.extend({
 	save: function (data, isDirectOperation, done) {
 		var self = this,
 			col,
-			done = arguments[arguments.length-1],
+			done = arguments[arguments.length - 1],
 			isDirectOperation = typeof isDirectOperation === 'function' ? false : isDirectOperation;
 
 		connect.call(self.__adapter.mongodb, function (err, db) {
@@ -195,16 +203,21 @@ module.exports = baseAdapter.extend({
 			};
 
 			var _id = data._id;
-			var updateQuery = {$set:data};
+			var updateQuery = {
+				$set: data
+			};
 
 			if (isDirectOperation) {
 				delete data['_id'];
 				updateQuery = data;
 			}
 
-			col.findAndModify(
-				{ _id: _id }, // query
-				[['_id','asc']],	// sort order
+			col.findAndModify({
+					_id: _id
+				}, // query
+				[
+					['_id', 'asc']
+				], // sort order
 				updateQuery,
 				options,
 				function (err, updateResponse) {
