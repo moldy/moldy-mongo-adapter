@@ -300,7 +300,6 @@ personMoldy.$findOne(function (_error, _person) {
 		}, function (_error, newPerson) {
 			newPerson.id.should.equal(key);
 			newPerson.friends.splice(1, 1);
-
 			newPerson.$save(function (_error) {
 				if (_error) {
 					return _done(_error);
