@@ -1,6 +1,7 @@
 var MongoClient = require('mongodb').MongoClient,
 	baseAdapter = require('moldy-base-adapter'),
-	ObjectID = require('mongodb').ObjectID;
+	ObjectID = require('mongodb').ObjectID,
+	dotNotation = require('mongo-dot-notation');
 
 var config = {
 	connectionString: 'mongodb://127.0.0.1:27017/',
@@ -94,7 +95,6 @@ module.exports = baseAdapter.extend({
 
 			col.findOne(query, function (err, dbItem) {
 				if (err) return done(err);
-
 				if (!dbItem) {
 					return done(null, undefined);
 				}
@@ -181,11 +181,11 @@ module.exports = baseAdapter.extend({
 			});
 		});
 	},
-	save: function (data, isDirectOperation, done) {
+	save: function (data, isDirectOperation) {
 		var self = this,
 			col,
-			done = arguments[arguments.length - 1],
-			isDirectOperation = typeof isDirectOperation === 'function' ? false : isDirectOperation;
+			done = arguments[arguments.length - 1];
+		isDirectOperation = typeof isDirectOperation === 'function' ? false : isDirectOperation;
 
 		connect.call(self.__adapter.mongodb, function (err, db) {
 			if (err) return done(err);
@@ -203,29 +203,37 @@ module.exports = baseAdapter.extend({
 			};
 
 			var _id = data._id;
-			var updateQuery = {
-				$set: data
+
+			// Query
+			var query = {
+				_id: _id
 			};
 
+			// Sort order
+			var sort = [
+				['_id', 'asc']
+			];
+
+			var updateQuery;
+
 			if (isDirectOperation) {
+				// If this is a direct operation, it's assumed we've passed a mongo
+				// query rather than some data to insert.
 				delete data['_id'];
 				updateQuery = data;
+			} else {
+				// Flatten the data into dot notation
+				// https://www.npmjs.com/package/mongo-dot-notation#convert-a-simple-object
+				updateQuery = dotNotation.flatten(data);
+				delete updateQuery.$set._id;
 			}
 
-			col.findAndModify({
-					_id: _id
-				}, // query
-				[
-					['_id', 'asc']
-				], // sort order
-				updateQuery,
-				options,
-				function (err, updateResponse) {
-					if (err) return done(err);
-					if (updateResponse.ok !== 1) return done(new Error('MongoDb returned an unexpected amount of items on save: ' + updateCount));
-					done(null, updateResponse.value);
-				}
-			);
+			var saveDone = function (err, updateResponse) {
+				if (err) return done(err);
+				if (updateResponse.ok !== 1) return done(new Error('MongoDb returned an unexpected amount of items on save: ' + updateCount));
+				done(null, updateResponse.value);
+			};
+			col.findAndModify(query, sort, updateQuery,	options, saveDone);
 		});
 	},
 	destroy: function (data, done) {

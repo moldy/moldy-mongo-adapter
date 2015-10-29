@@ -19,6 +19,7 @@
   "homepage": "https://github.com/moldy/moldy-mongo-adapter",
   "dependencies": {
     "moldy-base-adapter": "0.0.4",
+    "mongo-dot-notation": "^1.0.1",
     "mongodb": "^2.0.36"
   },
   "devDependencies": {
