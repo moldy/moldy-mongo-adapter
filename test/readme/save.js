@@ -1,5 +1,6 @@
 var Moldy = require('moldy'),
-	should = require('should');
+	should = require('should'),
+	async = require('async');
 
 describe('save', function () {
 	var schema,
@@ -20,6 +21,19 @@ describe('save', function () {
 				age: {
 					type: 'number',
 					default: 0
+				},
+				backpack: {
+					keyless: true,
+					properties: {
+						mainCompartment: {
+							type: 'string',
+							default: 'comic books',
+						},
+						leftPocket: {
+							type: 'string',
+							default: 'chewing gum',
+						}
+					}
 				},
 				friends: [{
 					keyless: true,
@@ -99,6 +113,47 @@ describe('save', function () {
 		});
 	});
 
+	it('should `update` a model', function (_done) {
+
+		function getMoldyPerson(_pDone) {
+			Moldy.extend('person', schema).$findOne({
+				id: key
+			}, _pDone);
+		}
+
+		async.parallel({
+			// Get two Moldy references to the same thing.
+			person1: getMoldyPerson,
+			person2: getMoldyPerson,
+		}, function (_error, _people) {
+			if (_error) return _done(_error);
+
+			async.series([
+				// Update a property of each, individually.
+				function (_sDone) {
+					_people.person1.backpack.mainCompartment = 'precious vase';
+					_people.person1.$update(_sDone);
+				},
+				function (_sDone) {
+					_people.person2.backpack.leftPocket = 'instruction manual';
+					_people.person2.$update(_sDone);
+				},
+			], function (_error) {
+				if (_error) return _done(_error);
+
+				// Get another reference of the moldy thing and check whether The
+				// update method has updated or clobbered the data
+				getMoldyPerson(function (_error, _person) {
+					if (_error) return _done(_error);
+					_person.backpack.mainCompartment.should.eql('precious vase');
+					_person.backpack.leftPocket.should.eql('instruction manual');
+					_done();
+				});
+			});
+
+		});
+	});
+
 	it('should bypass moldy and do an $inc operation', function (_done) {
 		var personMoldy = Moldy.extend('person', schema);
 
@@ -114,7 +169,7 @@ describe('save', function () {
 			_person.friends[0].age.should.eql(0);
 
 			specialUpdate = {
-				id : _person.id,
+				id: _person.id,
 				$inc: {
 					age: 1
 				}

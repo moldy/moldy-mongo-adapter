@@ -253,6 +253,19 @@ schema = {
 			type: 'number',
 			default: 0
 		},
+		backpack: {
+			keyless: true,
+			properties: {
+				mainCompartment: {
+					type: 'string',
+					default: 'comic books',
+				},
+				leftPocket: {
+					type: 'string',
+					default: 'chewing gum',
+				}
+			}
+		},
 		friends: [{
 			keyless: true,
 			properties: {
@@ -318,6 +331,44 @@ personMoldy.$findOne(function (_error, _person) {
 });
 ```
 
+should `update` a model.
+
+```js
+function getMoldyPerson(_pDone) {
+			Moldy.extend('person', schema).$findOne({
+				id: key
+			}, _pDone);
+		}
+		async.parallel({
+			// Get two Moldy references to the same thing.
+			person1: getMoldyPerson,
+			person2: getMoldyPerson,
+		}, function (_error, _people) {
+			if (_error) return _done(_error);
+			async.series([
+				// Update a property of each, individually.
+				function (_sDone) {
+					_people.person1.backpack.mainCompartment = 'precious vase';
+					_people.person1.$update(_sDone);
+				},
+				function (_sDone) {
+					_people.person2.backpack.leftPocket = 'instruction manual';
+					_people.person2.$update(_sDone);
+				},
+			], function (_error) {
+				if (_error) return _done(_error);
+				// Get another reference of the moldy thing and check whether The
+				// update method has updated or clobbered the data
+				getMoldyPerson(function (_error, _person) {
+					if (_error) return _done(_error);
+					_person.backpack.mainCompartment.should.eql('precious vase');
+					_person.backpack.leftPocket.should.eql('instruction manual');
+					_done();
+				});
+			});
+		});
+```
+
 should bypass moldy and do an $inc operation.
 
 ```js
@@ -331,7 +382,7 @@ personMoldy.$findOne({
 	_person.age.should.eql(0);
 	_person.friends[0].age.should.eql(0);
 	specialUpdate = {
-		id : _person.id,
+		id: _person.id,
 		$inc: {
 			age: 1
 		}
