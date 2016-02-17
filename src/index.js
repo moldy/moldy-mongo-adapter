@@ -192,15 +192,21 @@ module.exports = baseAdapter.extend({
 
 			col = getCollection.call(self, db);
 
-			data = moldyToMongo(data);
-
-			if (!data) return done(new Error('Can not save data that has no id'), 0);
-
 			var options = {
 				remove: false,
 				new: true, //returns the modified record
 				upsert: false
 			};
+
+			// If its a direct operation specifying the _id in the data means we want to do a upsert
+			if (data._id) {
+				options.upsert = true;
+			}
+
+			data = moldyToMongo(data);
+
+			if (!data) return done(new Error('Can not save data that has no id'), 0);
+
 
 			var _id = data._id;
 
@@ -217,9 +223,9 @@ module.exports = baseAdapter.extend({
 			var updateQuery;
 
 			if (isDirectOperation) {
-				// If this is a direct operation, it's assumed we've passed a mongo
-				// query rather than some data to insert.
-				delete data['_id'];
+				if (!options.upsert) {
+					delete data['_id'];
+				}
 				updateQuery = data;
 			} else {
 				// Flatten the data into dot notation
@@ -233,7 +239,7 @@ module.exports = baseAdapter.extend({
 				if (updateResponse.ok !== 1) return done(new Error('MongoDb returned an unexpected amount of items on save: ' + updateCount));
 				done(null, updateResponse.value);
 			};
-			col.findAndModify(query, sort, updateQuery,	options, saveDone);
+			col.findAndModify(query, sort, updateQuery, options, saveDone);
 		});
 	},
 	destroy: function (data, done) {
