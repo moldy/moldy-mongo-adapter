@@ -381,7 +381,7 @@ personMoldy.$findOne({
 	}
 	_person.age.should.eql(0);
 	_person.friends[0].age.should.eql(0);
-	specialUpdate = {
+	var specialUpdate = {
 		id: _person.id,
 		$inc: {
 			age: 1
@@ -402,6 +402,35 @@ personMoldy.$findOne({
 			newPerson.age.should.eql(1);
 			_done(_error);
 		});
+	});
+});
+```
+
+should bypass moldy and do an upsert.
+
+```js
+var ObjectID = require('mongodb').ObjectID;
+var personMoldy = Moldy.extend('person', schema);
+var specialPerson = personMoldy.create({
+	id: '000000000000000000001337',
+	name: 'Mr Upsert'
+});
+var specialUpdate = specialPerson.$json();
+specialUpdate._id = new ObjectID('000000000000000000001337');
+specialPerson.$save(specialUpdate, function (_error, _updatedUser) {
+	if (_error) {
+		return _done(_error);
+	}
+	specialPerson.id.should.eql('000000000000000000001337');
+	_updatedUser.id.should.eql('000000000000000000001337');
+	specialPerson.name.should.eql('Mr Upsert');
+	_updatedUser.name.should.eql('Mr Upsert');
+	personMoldy.$findOne({
+		name: 'Mr Upsert'
+	}, function (_error, newPerson) {
+		newPerson.id.should.equal('000000000000000000001337');
+		newPerson.name.should.eql('Mr Upsert');
+		_done(_error);
 	});
 });
 ```
