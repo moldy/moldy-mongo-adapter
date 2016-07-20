@@ -14,17 +14,27 @@ var config = {
 var db;
 
 var connect = function (callback) {
-	var self = this,
-		cs = self.config.connectionString ? self.config.connectionString : config.connectionString,
-		dbName = self.config.databaseName ? self.config.databaseName : config.databaseName,
-		options = self.config.options ? self.config.options : config.options;
+	var self = this;
 
+	//Already setup.
 	if (db) return callback(null, db);
-	MongoClient.connect(cs + dbName, options, function (_error, _db) {
+
+	var connected = function (_error, _db) {
 		if (_error) return callback(_error);
 		db = self._db = _db;
 		callback(null, db);
-	});
+	};
+
+	//Newer way of connecting
+	if (process.env.MONGO_CONNECTION_STRING) {
+		return MongoClient.connect(process.env.MONGO_CONNECTION_STRING, connected);
+	}
+
+	var cs = self.config.connectionString ? self.config.connectionString : config.connectionString,
+		dbName = self.config.databaseName ? self.config.databaseName : config.databaseName,
+		options = self.config.options ? self.config.options : config.options;
+
+	MongoClient.connect(cs + dbName, options, connected);
 };
 
 var getCollection = function (db) {

@@ -4,7 +4,7 @@
   "description": "A file adapter for `Moldy`",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha test/readme.js",
+    "test": "make test",
     "posttest": "mocha test/readme.js -R markdown > README.md"
   },
   "repository": {
@@ -28,7 +28,7 @@
     "gulp-jshint": "^1.5.3",
     "gulp-shell": "^0.2.4",
     "jshint-stylish": "^0.1.5",
-    "mocha": "^2.2.5",
+    "mocha": "^2.5.3",
     "moldy": "*",
     "should": "^7.0.2"
   }
